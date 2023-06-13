@@ -1,36 +1,28 @@
-class Animal {
-  constructor(species) {
-    this._species = species;
-  }
+() => {
+  cy.visit(baseUrl + "/main.html");
+  cy.window().then(win => {
+    const Animal = win.Animal;
+    const Cat = win.Cat;
+    const Dog = win.Dog;
 
-  get species() {
-    return this._species;
-  }
+    cy.stub(win.console, "log").as("consoleLog");
 
-  makeSound() {
-    console.log("The animal makes a sound.");
-  }
+    const species = "Siamese";
+    const myCat = new Cat(species);
+
+    myCat.makeSound();
+    cy.get("@consoleLog").should("be.calledWith", `The ${species} makes a sound`);
+
+    myCat.purr();
+    cy.get("@consoleLog").should("be.calledWith", "purr");
+
+    const dogSpecies = "Golden Retriever";
+    const myDog = new Dog(dogSpecies);
+
+    myDog.makeSound();
+    cy.get("@consoleLog").should("be.calledWith", `The ${dogSpecies} makes a sound`);
+
+    myDog.bark();
+    cy.get("@consoleLog").should("be.calledWith", "woof");
+  });
 }
-
-class Cat extends Animal {
-  purr() {
-    console.log("purr");
-  }
-}
-
-class Dog extends Animal {
-  bark() {
-    console.log("woof");
-  }
-}
-
-// Example usage:
-const cat = new Cat("Felis catus");
-console.log(cat.species); // Output: Felis catus
-cat.makeSound(); // Output: The animal makes a sound.
-cat.purr(); // Output: purr
-
-const dog = new Dog("Canis lupus familiaris");
-console.log(dog.species); // Output: Canis lupus familiaris
-dog.makeSound(); // Output: The animal makes a sound.
-dog.bark(); // Output: woof
